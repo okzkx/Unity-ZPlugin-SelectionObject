@@ -30,9 +30,10 @@ public static class ColoredInstanceID {
 }
 
 public class SelectionObjectRenderPass : ScriptableRenderPass {
-    private static RenderTexture _renderTexture;
-    private static Material _material;
-
+    private RenderTexture _renderTexture;
+    private Material _material;
+    private RenderTexture _pixelRenderTexture;
+    private Texture2D _texture;
 
     public SelectionObjectRenderPass() {
         _renderTexture = new RenderTexture(Screen.width, Screen.height, 0, GraphicsFormat.R8G8B8A8_SRGB) {
@@ -40,6 +41,14 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
         };
         var shader = Resources.Load<Shader>("DrawInstanceID");
         _material = CoreUtils.CreateEngineMaterial(shader);
+
+        _pixelRenderTexture = new RenderTexture(1, 1, 0, GraphicsFormat.R8G8B8A8_SRGB) {
+            name = "pixelRenderTexture"
+        };
+
+
+        _texture = new Texture2D(1, 1, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None);
+
         renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
     }
 
@@ -72,20 +81,18 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
             }
         }
 
-        // if (PickBufferManager.instance != null && pickBufferMaterial != null) {
-        //     var objs = PickBufferManager.instance.objs;
-        //
-        //     for (int i = 0; i < objs.Count; i++) {
-        //         var obj = objs[i];
-        //         var color = PickBufferManager.instance.IDToColor(i);
-        //         var renderer = obj.GetComponent<MeshRenderer>();
-        //         cmd.SetGlobalColor("_Color", color);
-        //         cmd.DrawRenderer(renderer, pickBufferMaterial, 0, 0);
-        //     }
-        // }
+        cmd.Blit(_renderTexture, _pixelRenderTexture, new Vector2(10, 10), Input.mousePosition);
 
         context.ExecuteCommandBuffer(cmd);
         CommandBufferPool.Release(cmd);
+
+        RenderTexture.active = _pixelRenderTexture;
+        _texture.ReadPixels(new Rect(0, 0, _pixelRenderTexture.width, _pixelRenderTexture.height), 0, 0);
+        _texture.Apply();
+        var pickedColor = _texture.GetPixel(0, 0);
+        Debug.Log(Input.mousePosition);
+        Debug.Log(pickedColor);
+        RenderTexture.active = null;
     }
 }
 
