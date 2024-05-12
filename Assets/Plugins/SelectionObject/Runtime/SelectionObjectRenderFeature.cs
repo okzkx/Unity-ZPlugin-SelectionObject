@@ -5,18 +5,27 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
-public static class ColorConverter
-{
-    public static Color32 ToColor(int value)
-    {
+
+public static class ColorConverter {
+    public static Color32 ToColor(int value) {
         Span<byte> bytes = stackalloc byte[4];
         BitConverter.TryWriteBytes(bytes, value + 1);
         return new Color32(bytes[0], bytes[1], bytes[2], bytes[3]);
     }
-    public static int ToInt(Color32 value)
-    {
+
+    public static int ToInt(Color32 value) {
         ReadOnlySpan<byte> bytes = stackalloc byte[] { value.r, value.g, value.b, value.a };
         return BitConverter.ToInt32(bytes) - 1;
+    }
+}
+
+public static class ColoredInstanceID {
+    private static Dictionary<Color, int> dic = new Dictionary<Color, int>();
+
+    public static Color GetColorDebug(int instanceId) {
+        var color = ColorConverter.ToColor((instanceId * 10000).GetHashCode());
+        dic[color] = instanceId;
+        return color;
     }
 }
 
@@ -26,7 +35,7 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
 
 
     public SelectionObjectRenderPass() {
-        _renderTexture = new RenderTexture(Screen.width, Screen.height, 0, GraphicsFormat.R8G8B8A8_SInt) {
+        _renderTexture = new RenderTexture(Screen.width, Screen.height, 0, GraphicsFormat.R8G8B8A8_SRGB) {
             name = "InstanceIDTexture"
         };
         var shader = Resources.Load<Shader>("DrawInstanceID");
@@ -35,6 +44,10 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
     }
 
     public override void Execute(ScriptableRenderContext context, ref RenderingData renderingData) {
+        if (renderingData.cameraData.cameraType != CameraType.Game) {
+            return;
+        }
+
         var cmd = CommandBufferPool.Get("SelectionObject Render Pass");
         cmd.SetRenderTarget(_renderTexture, depthAttachment);
         cmd.ClearRenderTarget(RTClearFlags.Color, Color.clear, 1, 0);
@@ -51,13 +64,14 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
                         // Graphics.DrawMesh(mesh, renderer.gameObject.transform.localToWorldMatrix, _material, 0);
                         //  new MaterialPropertyBlock();
                         // renderer.SetPropertyBlock();
-                        cmd.SetGlobalColor("_InstanceID", ColorConverter.ToColor(renderer.gameObject.GetInstanceID()) );
+                        var color = ColoredInstanceID.GetColorDebug(renderer.gameObject.GetInstanceID());
+                        cmd.SetGlobalColor("_InstanceID", color);
                         cmd.DrawRenderer(renderer, _material);
                     }
                 }
             }
         }
-        
+
         // if (PickBufferManager.instance != null && pickBufferMaterial != null) {
         //     var objs = PickBufferManager.instance.objs;
         //
