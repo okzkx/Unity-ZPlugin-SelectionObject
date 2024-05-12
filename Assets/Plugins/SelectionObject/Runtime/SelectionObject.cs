@@ -5,6 +5,7 @@ using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 
 public static class SelectionObject {
+
     private static RenderTexture _renderTexture;
     private static Material _material;
     private static int frameCount;

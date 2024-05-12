@@ -46,8 +46,12 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
             name = "pixelRenderTexture"
         };
 
+        // _pixelRenderTexture = new RenderTexture(Screen.width, Screen.height, 0, GraphicsFormat.R8G8B8A8_SRGB) {
+        //     name = "pixelRenderTexture"
+        // };
 
-        _texture = new Texture2D(1, 1, GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None);
+        _texture = new Texture2D(_pixelRenderTexture.width, _pixelRenderTexture.height,
+            GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None);
 
         renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
     }
@@ -81,7 +85,27 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
             }
         }
 
-        cmd.Blit(_renderTexture, _pixelRenderTexture, new Vector2(10, 10), Input.mousePosition);
+        // cmd.Blit(_renderTexture, _pixelRenderTexture, 
+        //     new Vector2(_pixelRenderTexture.width, _pixelRenderTexture.height), 
+        //     Input.mousePosition);
+
+        // cmd.Blit(_renderTexture, _pixelRenderTexture,
+        //     new Vector2(_pixelRenderTexture.width, _pixelRenderTexture.height),
+        //     new Vector2(300, 300));
+
+        cmd.CopyTexture(
+            _renderTexture,
+            0,
+            0,
+            Math.Clamp((int)Input.mousePosition.x, 0, Screen.width - 1),
+            Math.Clamp((int)Input.mousePosition.y, 0, Screen.height- 1),
+            _pixelRenderTexture.width,
+            _pixelRenderTexture.height,
+            _pixelRenderTexture,
+            0,
+            0,
+            0, 0
+        );
 
         context.ExecuteCommandBuffer(cmd);
         CommandBufferPool.Release(cmd);
@@ -90,7 +114,6 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
         _texture.ReadPixels(new Rect(0, 0, _pixelRenderTexture.width, _pixelRenderTexture.height), 0, 0);
         _texture.Apply();
         var pickedColor = _texture.GetPixel(0, 0);
-        Debug.Log(Input.mousePosition);
         Debug.Log(pickedColor);
         RenderTexture.active = null;
     }
