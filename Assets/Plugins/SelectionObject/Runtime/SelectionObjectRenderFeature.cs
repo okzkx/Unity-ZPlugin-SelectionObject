@@ -26,31 +26,15 @@ public static class ColoredInstanceID {
 
 
     public static Color GetColorDebug(int instanceId) {
-        var color = ColorConverter.ToColor((instanceId * 10000).GetHashCode());
+        // var color = ColorConverter.ToColor((instanceId * 10000).GetHashCode());
+        UnityEngine.Random.InitState(instanceId);
+        Color color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
         dic[color] = instanceId;
         return color;
     }
 
     public static int GetIDDebug(Color color) {
         return dic.GetValueOrDefault(color, 0);
-    }
-
-    public static int GetColoredID(int instanceId) {
-        UnityEngine.Random.InitState(instanceId);
-        // Color32 color = Color.HSVToRGB(UnityEngine.Random.value, 1, 1);
-        Color32 color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
-        
-
-        // int a = (instanceId * 10000).GetHashCode();
-        Debug.Log("color : " + color);
-        var a = ColorConverter.ToInt(color);
-        dic2[a] = instanceId;
-        return a;
-    }
-
-    public static int GetID(Color color) {
-        var coloredId = ColorConverter.ToInt(color);
-        return dic2.GetValueOrDefault(coloredId, 0);
     }
 }
 
@@ -61,22 +45,18 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
     private Texture2D _texture;
 
     public SelectionObjectRenderPass() {
-        _renderTexture = new RenderTexture(Screen.width, Screen.height, 0, GraphicsFormat.R8G8B8A8_SRGB) {
+        _renderTexture = new RenderTexture(Screen.width, Screen.height, 0, GraphicsFormat.R32G32B32A32_SFloat) {
             name = "InstanceIDTexture"
         };
         var shader = Resources.Load<Shader>("DrawInstanceID");
         _material = CoreUtils.CreateEngineMaterial(shader);
 
-        _pixelRenderTexture = new RenderTexture(1, 1, 0, GraphicsFormat.R8G8B8A8_SRGB) {
+        _pixelRenderTexture = new RenderTexture(1, 1, 0, GraphicsFormat.R32G32B32A32_SFloat) {
             name = "pixelRenderTexture"
         };
 
-        // _pixelRenderTexture = new RenderTexture(Screen.width, Screen.height, 0, GraphicsFormat.R8G8B8A8_SRGB) {
-        //     name = "pixelRenderTexture"
-        // };
-
         _texture = new Texture2D(_pixelRenderTexture.width, _pixelRenderTexture.height,
-            GraphicsFormat.R8G8B8A8_SRGB, TextureCreationFlags.None);
+            GraphicsFormat.R32G32B32A32_SFloat, TextureCreationFlags.None);
 
         renderPassEvent = RenderPassEvent.AfterRenderingTransparents;
     }
@@ -94,31 +74,12 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
         foreach (var renderer in renderers) {
             if ((renderer.gameObject.layer & LayerMask.NameToLayer("Selection")) > 0) {
                 if (renderer is MeshRenderer) {
-                    var meshFilter = renderer.GetComponent<MeshFilter>();
-                    if (meshFilter != null) {
-                        // var mesh = meshFilter.sharedMesh;
-                        // _material.SetInt("_InstanceID", renderer.gameObject.GetInstanceID());
-                        // Graphics.DrawMesh(mesh, renderer.gameObject.transform.localToWorldMatrix, _material, 0);
-                        // Graphics.DrawMesh(mesh, renderer.gameObject.transform.localToWorldMatrix, _material, 0);
-                        //  new MaterialPropertyBlock();
-                        // renderer.SetPropertyBlock();
-                        // var color = ColoredInstanceID.GetColorDebug(renderer.gameObject.GetInstanceID());
-                        var color = ColoredInstanceID.GetColoredID(renderer.gameObject.GetInstanceID());
-                        Debug.Log("Draw color" + color);
-                        cmd.SetGlobalInt("_InstanceID", color);
-                        cmd.DrawRenderer(renderer, _material);
-                    }
+                    var color = ColoredInstanceID.GetColorDebug(renderer.gameObject.GetInstanceID());
+                    cmd.SetGlobalColor("_InstanceID", color);
+                    cmd.DrawRenderer(renderer, _material);
                 }
             }
         }
-
-        // cmd.Blit(_renderTexture, _pixelRenderTexture, 
-        //     new Vector2(_pixelRenderTexture.width, _pixelRenderTexture.height), 
-        //     Input.mousePosition);
-
-        // cmd.Blit(_renderTexture, _pixelRenderTexture,
-        //     new Vector2(_pixelRenderTexture.width, _pixelRenderTexture.height),
-        //     new Vector2(300, 300));
 
         cmd.CopyTexture(
             _renderTexture,
@@ -140,11 +101,9 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
         RenderTexture.active = _pixelRenderTexture;
         _texture.ReadPixels(new Rect(0, 0, _pixelRenderTexture.width, _pixelRenderTexture.height), 0, 0);
         _texture.Apply();
-        var pickedColor = _texture.GetPixels32()[0];
-        Debug.Log("readback color" + pickedColor);
+        var pickedColor = _texture.GetPixels()[0];
         RenderTexture.active = null;
-
-        SelectionObject.InstanceID = ColoredInstanceID.GetID(pickedColor);
+        SelectionObject.InstanceID = ColoredInstanceID.GetIDDebug(pickedColor);
     }
 }
 

@@ -28,7 +28,8 @@ Shader "ZPlugin/SelectionObject/DrawInstanceID"
                 float4 vertex : SV_POSITION;
             };
 
-            int _InstanceID;
+            // float _InstanceID;
+            float4 _InstanceID;
             
             v2f vert (appdata v)
             {
@@ -38,16 +39,18 @@ Shader "ZPlugin/SelectionObject/DrawInstanceID"
                 return o;
             }
 
-            fixed4 frag (v2f i) : SV_Target
+            float4 frag (v2f i) : SV_Target
             {
                 // return _InstanceID;
                 
-                return fixed4(
-                    ((_InstanceID >> 24) & 0xF) / 255.0,
-                    ((_InstanceID >> 16) & 0xF) / 255.0,
-                    ((_InstanceID >> 8) & 0xF) / 255.0,
-                    (_InstanceID & 0xF) / 255.0
-                );
+                // return fixed4(
+                //     ((_InstanceID >> 24) & 0xF) / 255.0,
+                //     ((_InstanceID >> 16) & 0xF) / 255.0,
+                //     ((_InstanceID >> 8) & 0xF) / 255.0,
+                //     (_InstanceID & 0xF) / 255.0
+                // );
+
+                return _InstanceID;
             }
             ENDCG
         }
