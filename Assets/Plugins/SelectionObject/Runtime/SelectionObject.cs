@@ -10,10 +10,10 @@ public static class SelectionObject {
     private static int frameCount;
 
     public static void FindObjectOfScreenPosition(Vector3 mousePosition) {
-        UpdateIdRenderTexture();
+        TryInitIdRenderTexture();
     }
 
-    private static void UpdateIdRenderTexture() {
+    private static void TryInitIdRenderTexture() {
         if (_renderTexture == null) {
             _renderTexture = new RenderTexture(Screen.width, Screen.height, 0, GraphicsFormat.R32_SInt) {
                 name = "InstanceIDTexture"
@@ -27,10 +27,10 @@ public static class SelectionObject {
         }
 
 
-        if (Time.frameCount != frameCount) {
-            ReRenderRenderTexture();
-            frameCount = Time.frameCount;
-        }
+        // if (Time.frameCount != frameCount) {
+        //     ReRenderRenderTexture();
+        //     frameCount = Time.frameCount;
+        // }
     }
 
     private static void ReRenderRenderTexture() {
