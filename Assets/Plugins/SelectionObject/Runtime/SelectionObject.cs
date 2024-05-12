@@ -10,7 +10,7 @@ public static class SelectionObject {
     private static int frameCount;
 
     public static void FindObjectOfScreenPosition(Vector3 mousePosition) {
-        TryInitIdRenderTexture();
+        // TryInitIdRenderTexture();
     }
 
     private static void TryInitIdRenderTexture() {

@@ -1,9 +1,24 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
+public static class ColorConverter
+{
+    public static Color32 ToColor(int value)
+    {
+        Span<byte> bytes = stackalloc byte[4];
+        BitConverter.TryWriteBytes(bytes, value + 1);
+        return new Color32(bytes[0], bytes[1], bytes[2], bytes[3]);
+    }
+    public static int ToInt(Color32 value)
+    {
+        ReadOnlySpan<byte> bytes = stackalloc byte[] { value.r, value.g, value.b, value.a };
+        return BitConverter.ToInt32(bytes) - 1;
+    }
+}
 
 public class SelectionObjectRenderPass : ScriptableRenderPass {
     private static RenderTexture _renderTexture;
@@ -36,7 +51,7 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
                         // Graphics.DrawMesh(mesh, renderer.gameObject.transform.localToWorldMatrix, _material, 0);
                         //  new MaterialPropertyBlock();
                         // renderer.SetPropertyBlock();
-                        cmd.SetGlobalInt("_InstanceID", renderer.gameObject.GetInstanceID());
+                        cmd.SetGlobalColor("_InstanceID", ColorConverter.ToColor(renderer.gameObject.GetInstanceID()) );
                         cmd.DrawRenderer(renderer, _material);
                     }
                 }

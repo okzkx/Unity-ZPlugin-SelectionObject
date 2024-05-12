@@ -28,7 +28,7 @@ Shader "ZPlugin/SelectionObject/DrawInstanceID"
                 float4 vertex : SV_POSITION;
             };
 
-            int _InstanceID;
+            fixed4 _InstanceID;
             
             v2f vert (appdata v)
             {
@@ -38,7 +38,7 @@ Shader "ZPlugin/SelectionObject/DrawInstanceID"
                 return o;
             }
 
-            int frag (v2f i) : SV_Target
+            fixed4 frag (v2f i) : SV_Target
             {
                 return _InstanceID;
             }
