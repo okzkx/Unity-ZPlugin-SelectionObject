@@ -11,8 +11,9 @@ public class TestSelectionObject : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
+        SelectionObject.FindObjectOfScreenPosition(Input.mousePosition);
+        
         
     }
 }
