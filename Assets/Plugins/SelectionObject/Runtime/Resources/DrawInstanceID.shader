@@ -40,11 +40,13 @@ Shader "ZPlugin/SelectionObject/DrawInstanceID"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                return uint4(
-                    (_InstanceID >> 24) & 0xF,
-                    (_InstanceID >> 16) & 0xF,
-                    (_InstanceID >> 8) & 0xF,
-                    _InstanceID & 0xF
+                // return _InstanceID;
+                
+                return fixed4(
+                    ((_InstanceID >> 24) & 0xF) / 255.0,
+                    ((_InstanceID >> 16) & 0xF) / 255.0,
+                    ((_InstanceID >> 8) & 0xF) / 255.0,
+                    (_InstanceID & 0xF) / 255.0
                 );
             }
             ENDCG
