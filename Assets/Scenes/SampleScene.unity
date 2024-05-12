@@ -297,8 +297,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
-  m_LocalRotation: {x: -0.13921288, y: 0.8122352, z: -0.21590646, w: -0.52371585}
-  m_LocalPosition: {x: 4.148071, y: 2.5345538, z: 2.1171482}
+  m_LocalRotation: {x: -0.19814822, y: 0.79316604, z: -0.33610344, w: -0.4676103}
+  m_LocalPosition: {x: 3.3582027, y: 3.1821587, z: 1.9644045}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -609,7 +609,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1308978769}
   - component: {fileID: 1308978768}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Line
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -637,7 +637,6 @@ LineRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 10306, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 10308, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -660,7 +659,10 @@ LineRenderer:
   m_SortingOrder: 0
   m_Positions:
   - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 1.9483471}
+  - {x: 0.98572254, y: 0, z: 0.7853421}
+  - {x: 1.0377016, y: 0.6128624, z: 1.9714303}
+  - {x: 0.08037388, y: 0.24789578, z: 1.883964}
+  - {x: -1.406929, y: -1.1972843, z: 2.7924662}
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 0.1

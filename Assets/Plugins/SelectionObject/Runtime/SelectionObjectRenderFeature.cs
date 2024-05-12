@@ -1,50 +1,45 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public static class ColorConverter {
-    public static Color32 ToColor(int value) {
+internal static class ColorConverter {
+    internal static Color32 ToColor(int value) {
         Span<byte> bytes = stackalloc byte[4];
         BitConverter.TryWriteBytes(bytes, value + 1);
         return new Color32(bytes[0], bytes[1], bytes[2], bytes[3]);
     }
 
-    public static int ToInt(Color32 value) {
+    internal static int ToInt(Color32 value) {
         ReadOnlySpan<byte> bytes = stackalloc byte[] { value.r, value.g, value.b, value.a };
         return BitConverter.ToInt32(bytes) - 1;
     }
 }
 
-public static class ColoredInstanceID {
+internal static class ColoredInstanceID {
     private static Dictionary<Color, int> dic = new Dictionary<Color, int>();
 
-    private static Dictionary<int, int> dic2 = new Dictionary<int, int>();
-
-
-    public static Color GetColorDebug(int instanceId) {
-        // var color = ColorConverter.ToColor((instanceId * 10000).GetHashCode());
+    internal static Color GetColorDebug(int instanceId) {
         UnityEngine.Random.InitState(instanceId);
         Color color = new Color(UnityEngine.Random.value, UnityEngine.Random.value, UnityEngine.Random.value);
         dic[color] = instanceId;
         return color;
     }
 
-    public static int GetIDDebug(Color color) {
+    internal static int GetIDDebug(Color color) {
         return dic.GetValueOrDefault(color, 0);
     }
 }
 
-public class SelectionObjectRenderPass : ScriptableRenderPass {
+internal class SelectionObjectRenderPass : ScriptableRenderPass {
     private RenderTexture _renderTexture;
     private Material _material;
     private RenderTexture _pixelRenderTexture;
     private Texture2D _texture;
 
-    public SelectionObjectRenderPass() {
+    internal SelectionObjectRenderPass() {
         _renderTexture = new RenderTexture(Screen.width, Screen.height, 0, GraphicsFormat.R32G32B32A32_SFloat) {
             name = "InstanceIDTexture"
         };
@@ -105,7 +100,7 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
     }
 }
 
-public class SelectionObjectRenderFeature : ScriptableRendererFeature {
+internal class SelectionObjectRenderFeature : ScriptableRendererFeature {
     private static SelectionObjectRenderPass _pass;
 
     public override void Create() {
