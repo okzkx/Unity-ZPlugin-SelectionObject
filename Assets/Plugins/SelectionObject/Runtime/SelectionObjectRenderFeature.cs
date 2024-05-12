@@ -73,11 +73,9 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
         var renderers = GameObject.FindObjectsOfType<Renderer>();
         foreach (var renderer in renderers) {
             if ((renderer.gameObject.layer & LayerMask.NameToLayer("Selection")) > 0) {
-                if (renderer is MeshRenderer) {
-                    var color = ColoredInstanceID.GetColorDebug(renderer.gameObject.GetInstanceID());
-                    cmd.SetGlobalColor("_InstanceID", color);
-                    cmd.DrawRenderer(renderer, _material);
-                }
+                var color = ColoredInstanceID.GetColorDebug(renderer.gameObject.GetInstanceID());
+                cmd.SetGlobalColor("_InstanceID", color);
+                cmd.DrawRenderer(renderer, _material);
             }
         }
 
