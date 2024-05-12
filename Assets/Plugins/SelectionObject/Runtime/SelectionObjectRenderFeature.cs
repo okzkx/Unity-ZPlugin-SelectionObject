@@ -27,6 +27,10 @@ public static class ColoredInstanceID {
         dic[color] = instanceId;
         return color;
     }
+
+    public static int GetIDDebug(Color color) {
+        return dic.GetValueOrDefault(color, 0);
+    }
 }
 
 public class SelectionObjectRenderPass : ScriptableRenderPass {
@@ -78,6 +82,7 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
                         //  new MaterialPropertyBlock();
                         // renderer.SetPropertyBlock();
                         var color = ColoredInstanceID.GetColorDebug(renderer.gameObject.GetInstanceID());
+                        Debug.Log("Draw color" + color);
                         cmd.SetGlobalColor("_InstanceID", color);
                         cmd.DrawRenderer(renderer, _material);
                     }
@@ -98,7 +103,7 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
             0,
             0,
             Math.Clamp((int)Input.mousePosition.x, 0, Screen.width - 1),
-            Math.Clamp((int)Input.mousePosition.y, 0, Screen.height- 1),
+            Math.Clamp((int)Input.mousePosition.y, 0, Screen.height - 1),
             _pixelRenderTexture.width,
             _pixelRenderTexture.height,
             _pixelRenderTexture,
@@ -114,8 +119,10 @@ public class SelectionObjectRenderPass : ScriptableRenderPass {
         _texture.ReadPixels(new Rect(0, 0, _pixelRenderTexture.width, _pixelRenderTexture.height), 0, 0);
         _texture.Apply();
         var pickedColor = _texture.GetPixel(0, 0);
-        Debug.Log(pickedColor);
+        Debug.Log("readback color" + pickedColor);
         RenderTexture.active = null;
+
+        SelectionObject.InstanceID = ColoredInstanceID.GetIDDebug(pickedColor);
     }
 }
 
