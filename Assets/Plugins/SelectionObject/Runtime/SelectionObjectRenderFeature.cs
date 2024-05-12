@@ -18,6 +18,9 @@ internal static class ColorConverter {
     }
 }
 
+/// <summary>
+/// Thank for 【UnityShader】3D拾取（PickBuffer）（19） https://zhuanlan.zhihu.com/p/689092580
+/// </summary>
 internal static class ColoredInstanceID {
     private static Dictionary<Color, int> dic = new Dictionary<Color, int>();
 
